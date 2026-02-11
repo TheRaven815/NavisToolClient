@@ -1,6 +1,7 @@
 {
-    "source_dir": "",
     "plugin_name": "NavisIFCExport",
+    "source_folder_name": "NavisIFCExport",
+    "version_folder_prefix": "Navis",
     "navis_versions": [
         "2022", "2023", "2024", "2025"
     ],
