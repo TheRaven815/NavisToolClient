@@ -9,9 +9,11 @@ if root_dir not in sys.path:
 from PySide6.QtWidgets import QApplication
 from src.ui.main_window import MainWindow
 
+VERSION = "1.0.1"
+
 def main():
     app = QApplication(sys.argv)
-    window = MainWindow()
+    window = MainWindow(VERSION)
     window.show()
     sys.exit(app.exec())
 
