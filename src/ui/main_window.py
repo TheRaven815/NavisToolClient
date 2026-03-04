@@ -27,15 +27,18 @@ class MainWindow(QMainWindow):
         self.load_installed_versions()
 
     def init_ui(self):
-        # Balanced Dark Slate Palette
+        # VS Code Inspired Palette
         self.colors = {
-            "bg": "#1c1c1e",
-            "card": "#2c2c2e",
-            "accent": "#0a84ff",
-            "accent_hover": "#409cff",
-            "text": "#ffffff",
-            "text_dim": "#a1a1a6",
-            "border": "#3a3a3c"
+            "bg": "#1e1e1e",
+            "sidebar": "#252526",
+            "card": "#2d2d2d",
+            "accent": "#007acc",
+            "accent_hover": "#1f8ad2",
+            "text": "#cccccc",
+            "text_bright": "#ffffff",
+            "text_dim": "#858585",
+            "border": "#3c3c3c",
+            "warning": "#cca700"
         }
 
         self.setStyleSheet(f"""
@@ -44,17 +47,17 @@ class MainWindow(QMainWindow):
             }}
             QWidget {{
                 color: {self.colors['text']};
-                font-family: 'Segoe UI', Arial;
+                font-family: 'Segoe UI', Inter, Arial;
             }}
             QFrame#Card {{
-                background-color: {self.colors['card']};
+                background-color: {self.colors['sidebar']};
                 border: 1px solid {self.colors['border']};
-                border-radius: 8px;
+                border-radius: 4px;
             }}
             QLabel#Title {{
-                font-size: 18px;
+                font-size: 15px;
                 font-weight: 600;
-                color: white;
+                color: {self.colors['text_bright']};
             }}
             QLabel#Subtitle {{
                 font-size: 11px;
@@ -73,127 +76,115 @@ class MainWindow(QMainWindow):
                 outline: none;
             }}
             QListWidget::item {{
-                background-color: #3a3a3c;
-                border-radius: 6px;
-                padding: 6px 10px;
-                margin-bottom: 4px;
+                background-color: transparent;
+                border-radius: 3px;
+                padding: 4px 8px;
+                margin-bottom: 1px;
                 font-size: 12px;
             }}
             QListWidget::item:selected {{
-                background-color: {self.colors['accent']};
-                color: white;
+                background-color: #37373d;
+                color: {self.colors['text_bright']};
+                border: 1px solid {self.colors['accent']};
             }}
             QListWidget::item:hover:!selected {{
-                background-color: #48484a;
+                background-color: #2a2d2e;
             }}
             QPushButton#PrimaryBtn {{
                 background-color: {self.colors['accent']};
                 color: white;
                 border: none;
-                border-radius: 8px;
-                padding: 10px;
-                font-size: 13px;
+                border-radius: 3px;
+                padding: 6px 12px;
+                font-size: 12px;
                 font-weight: 600;
             }}
             QPushButton#PrimaryBtn:hover {{
                 background-color: {self.colors['accent_hover']};
             }}
             QPushButton#GhostBtn {{
-                background-color: transparent;
-                color: {self.colors['text_dim']};
-                border: 1px solid {self.colors['border']};
-                border-radius: 6px;
-                padding: 3px 8px;
-                font-size: 10px;
+                background-color: #3a3d41;
+                color: {self.colors['text_bright']};
+                border: none;
+                border-radius: 3px;
+                padding: 4px 10px;
+                font-size: 11px;
             }}
             QPushButton#GhostBtn:hover {{
-                background-color: #3a3a3c;
-                color: white;
+                background-color: #45494e;
             }}
             QStatusBar {{
-                background-color: {self.colors['bg']};
-                color: {self.colors['text_dim']};
-                font-size: 10px;
+                background-color: {self.colors['accent']};
+                color: white;
+                font-size: 11px;
+            }}
+            QStatusBar::item {{
+                border: none;
             }}
         """)
 
         central_widget = QWidget()
         self.setCentralWidget(central_widget)
         main_layout = QVBoxLayout(central_widget)
-        main_layout.setContentsMargins(15, 15, 15, 10)
+        main_layout.setContentsMargins(12, 12, 12, 8)
         main_layout.setSpacing(0)
 
         # --- Header ---
+        header_layout = QVBoxLayout()
         plugin_name = self.config.get("plugin_name", "Navisworks")
         title = QLabel(f"{plugin_name} Deployer")
         title.setObjectName("Title")
-        main_layout.addWidget(title)
+        header_layout.addWidget(title)
         
-        subtitle = QLabel("Plugin management and deployment tool")
+        subtitle = QLabel("Plugin Management Console")
         subtitle.setObjectName("Subtitle")
-        main_layout.addWidget(subtitle)
-        main_layout.addSpacing(10)
+        header_layout.addWidget(subtitle)
+        main_layout.addLayout(header_layout)
+        main_layout.addSpacing(12)
 
         # --- Detection Card ---
         card = QFrame()
         card.setObjectName("Card")
         card_layout = QVBoxLayout(card)
-        card_layout.setContentsMargins(12, 12, 12, 12)
-        card_layout.setSpacing(10)
+        card_layout.setContentsMargins(8, 8, 8, 8)
+        card_layout.setSpacing(8)
 
-        section_header = QHBoxLayout()
-        section_label = QLabel("Available Versions")
+        section_label = QLabel("Available Targets")
         section_label.setObjectName("SectionTitle")
-        section_header.addWidget(section_label, 0, Qt.AlignVCenter)
-        section_header.addStretch()
-        
-        refresh_label = QLabel("AUTO-DETECTED")
-        refresh_label.setFixedHeight(16) # Fix height to prevent stretching
-        refresh_label.setStyleSheet(f"""
-            color: {self.colors['accent']}; 
-            font-size: 8px; 
-            font-weight: bold; 
-            border: 1px solid {self.colors['accent']}; 
-            border-radius: 3px; 
-            padding: 1px 4px;
-        """)
-        section_header.addWidget(refresh_label, 0, Qt.AlignVCenter)
-        
-        card_layout.addLayout(section_header)
+        card_layout.addWidget(section_label)
 
         self.version_list = QListWidget()
         self.version_list.setSelectionMode(QListWidget.MultiSelection)
-        self.version_list.setFixedHeight(160)
+        self.version_list.setFixedHeight(180)
         card_layout.addWidget(self.version_list)
         
         main_layout.addWidget(card)
-        main_layout.addSpacing(15)
+        main_layout.addSpacing(12)
 
         # --- Action Section ---
-        self.btn_deploy = QPushButton(f"Deploy to Selected Versions")
+        self.btn_deploy = QPushButton(f"Deploy to Selected")
         self.btn_deploy.setObjectName("PrimaryBtn")
         self.btn_deploy.setCursor(Qt.PointingHandCursor)
         self.btn_deploy.clicked.connect(self.deploy_plugins)
         
-        # Add shadow to primary button
-        shadow = QGraphicsDropShadowEffect()
-        shadow.setBlurRadius(15)
-        shadow.setColor(QColor(0, 132, 255, 60))
-        shadow.setOffset(0, 3)
-        self.btn_deploy.setGraphicsEffect(shadow)
-        
         main_layout.addWidget(self.btn_deploy)
         
-        # This push the footer to the bottom while keeping upper elements tight
         main_layout.addStretch()
 
         # --- Footer ---
         footer_layout = QHBoxLayout()
-        footer_layout.setContentsMargins(0, 10, 0, 5)
+        footer_layout.setContentsMargins(0, 8, 0, 0)
         
-        version_label = QLabel(f"Version {self.current_version}")
+        version_label = QLabel(f"v{self.current_version}")
         version_label.setStyleSheet(f"color: {self.colors['text_dim']}; font-size: 10px;")
         footer_layout.addWidget(version_label)
+        
+        footer_layout.addStretch()
+        
+        # Attribution
+        attr_label = QLabel("Coded by Enes Eliağır")
+        attr_label.setStyleSheet(f"color: {self.colors['text_dim']}; font-size: 10px;")
+        footer_layout.addWidget(attr_label)
         
         footer_layout.addStretch()
         
@@ -207,10 +198,11 @@ class MainWindow(QMainWindow):
 
         # Setup Status Bar
         self.setStatusBar(QStatusBar())
+        self.statusBar().showMessage("Ready")
 
     def check_updates(self):
         self.btn_deploy.setEnabled(False)
-        self.statusBar().showMessage("Güncellemeler denetleniyor...")
+        self.statusBar().showMessage("🔍 Checking for updates...")
         
         self.update_thread = QThread()
         self.update_worker = UpdateWorker(self.current_version, REPO_URL)
@@ -226,21 +218,21 @@ class MainWindow(QMainWindow):
 
     def on_update_result(self, result):
         self.btn_deploy.setEnabled(True)
-        self.statusBar().showMessage("")
+        self.statusBar().showMessage("Ready.")
         
         if result.get("update_available"):
-            msg = f"Yeni Versiyon: {result['latest_version']}\n\nNotlar:\n{result['release_notes']}\n\nŞimdi indirip güncellemek istiyor musunuz?"
-            reply = QMessageBox.question(self, "Güncelleme Mevcut", msg, QMessageBox.Yes | QMessageBox.No)
+            msg = f"A new version is available: {result['latest_version']}\n\nNotes:\n{result['release_notes']}\n\nDo you want to download and update now?"
+            reply = QMessageBox.question(self, "Update Available", msg, QMessageBox.Yes | QMessageBox.No)
             
             if reply == QMessageBox.Yes:
                 self.start_download(result["download_url"])
         else:
-            QMessageBox.information(self, "Güncel", "Uygulamanız zaten güncel!")
+            QMessageBox.information(self, "Up to Date", "Your application is already up to date!")
 
     def on_update_error(self, error):
         self.btn_deploy.setEnabled(True)
-        self.statusBar().showMessage("")
-        QMessageBox.warning(self, "Hata", f"Güncelleme kontrolü başarısız: {error}")
+        self.statusBar().showMessage("Update check failed.")
+        QMessageBox.warning(self, "Error", f"Update check failed: {error}")
 
     def start_download(self, url):
         save_path = os.path.join(os.getcwd(), UPDATE_FILENAME)
@@ -258,37 +250,42 @@ class MainWindow(QMainWindow):
         self.download_thread.start()
 
     def on_download_progress(self, percent, downloaded, total):
-        self.statusBar().showMessage(f"İndiriliyor: %{percent} ({downloaded/1024/1024:.1f}MB / {total/1024/1024:.1f}MB)")
+        self.statusBar().showMessage(f"📥 Downloading: {percent}% ({downloaded/1024/1024:.1f}MB / {total/1024/1024:.1f}MB)")
 
     def on_download_finished(self, path):
         self.btn_deploy.setEnabled(True)
-        self.statusBar().showMessage("İndirme tamamlandı!")
+        self.statusBar().showMessage("Download complete!")
         
-        QMessageBox.information(self, "Başarılı", "Güncelleme indirildi. Uygulama kapatılacak ve yeni versiyon başlatılacak.")
+        QMessageBox.information(self, "Success", "Update downloaded. The application will close and start the new version.")
         
         try:
             import subprocess
             subprocess.Popen([path], shell=True)
             self.close()
         except Exception as e:
-            QMessageBox.critical(self, "Hata", f"Yeni versiyon başlatılamadı: {e}")
+            QMessageBox.critical(self, "Error", f"Failed to start new version: {e}")
 
     def on_download_error(self, error):
         self.btn_deploy.setEnabled(True)
-        self.statusBar().showMessage("")
-        QMessageBox.critical(self, "Hata", f"İndirme hatası: {error}")
+        self.statusBar().showMessage("Download failed.")
+        QMessageBox.critical(self, "Error", f"Download error: {error}")
 
     def load_installed_versions(self):
         self.version_list.clear()
         versions = self.navis.detect_installed_versions()
         for v in versions:
-            item = QListWidgetItem(f"Navisworks Manage {v}")
+            if v == "DEBUG":
+                item = QListWidgetItem(f"🛠️ LOCAL DEBUG (Target: ./DEBUG_PLUGINS)")
+                item.setForeground(QColor(self.colors['warning']))
+            else:
+                item = QListWidgetItem(f"🏗️ Navisworks Manage {v}")
+            
             item.setData(Qt.UserRole, v)
             item.setSelected(True)
             self.version_list.addItem(item)
         
         if not versions:
-            empty_item = QListWidgetItem("No Navisworks detected")
+            empty_item = QListWidgetItem("❌ No Navisworks detected")
             empty_item.setFlags(Qt.NoItemFlags)
             self.version_list.addItem(empty_item)
 

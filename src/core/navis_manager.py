@@ -1,10 +1,11 @@
 import os
 import shutil
-import glob
 
 class NavisManager:
     def __init__(self, config_manager):
         self.config = config_manager
+        # Enable DEBUG mode for testing phase
+        self.DEBUG_MODE = True
 
     def detect_installed_versions(self):
         installed_versions = []
@@ -16,6 +17,11 @@ class NavisManager:
             check_path = f"C:/Program Files/Autodesk/Navisworks Manage {version}"
             if os.path.exists(check_path):
                 installed_versions.append(version)
+        
+        # Show "DEBUG" item in the list for testing
+        if self.DEBUG_MODE:
+            installed_versions.append("DEBUG")
+            
         return installed_versions
 
     def deploy_plugin(self, version):
@@ -23,25 +29,30 @@ class NavisManager:
         source_folder_name = self.config.get("source_folder_name", plugin_name)
         version_prefix = self.config.get("version_folder_prefix", "Navis")
         
-        # Local source path: {source_folder_name}/{version_prefix}{version}
-        source_dir = os.path.join(os.getcwd(), source_folder_name, f"{version_prefix}{version}")
-        
+        # Use local folder for DEBUG version
+        if version == "DEBUG":
+            available_versions = self.config.get("navis_versions", ["2022"])
+            test_version = available_versions[0]
+            source_dir = os.path.join(os.getcwd(), source_folder_name, f"{version_prefix}{test_version}")
+            target_dir = os.path.join(os.getcwd(), "DEBUG_PLUGINS")
+            display_version = "LOCAL DEBUG"
+        else:
+            source_dir = os.path.join(os.getcwd(), source_folder_name, f"{version_prefix}{version}")
+            target_template = self.config.get("target_base_path")
+            target_dir = target_template.format(version=version)
+            display_version = f"Navisworks {version}"
+
         if not os.path.exists(source_dir):
             return False, f"Source directory not found: {source_dir}"
 
-        target_template = self.config.get("target_base_path")
-        target_dir = target_template.format(version=version)
         plugin_target_dir = os.path.join(target_dir, plugin_name)
 
         try:
-            # 1. Clear target directory if it exists
             if os.path.exists(plugin_target_dir):
                 shutil.rmtree(plugin_target_dir)
             
-            # 2. Create fresh target directory
-            os.makedirs(plugin_target_dir)
+            os.makedirs(plugin_target_dir, exist_ok=True)
             
-            # 3. Copy all files from source to target
             files_to_copy = [f for f in os.listdir(source_dir) if os.path.isfile(os.path.join(source_dir, f))]
             
             if not files_to_copy:
@@ -50,6 +61,6 @@ class NavisManager:
             for file_name in files_to_copy:
                 shutil.copy2(os.path.join(source_dir, file_name), plugin_target_dir)
                 
-            return True, f"Successfully deployed {len(files_to_copy)} files to Navisworks {version}"
+            return True, f"Successfully deployed {len(files_to_copy)} files to {display_version}."
         except Exception as e:
-            return False, f"Error during deployment to {version}: {str(e)}"
+            return False, f"Error during deployment to {display_version}: {str(e)}"
