@@ -23,8 +23,24 @@ class MainWindow(QMainWindow):
         
         self.setWindowTitle("Navisworks Tool Client")
         self.setMinimumSize(500, 450)
+        
+        # Set Window Icon
+        self.set_app_icon()
+        
         self.init_ui()
         self.load_installed_versions()
+
+    def set_app_icon(self):
+        """Set the application icon from icon.ico, handling PyInstaller paths"""
+        import sys
+        
+        icon_path = "icon.ico"
+        if hasattr(sys, '_MEIPASS'):
+            # Path for PyInstaller bundled EXE
+            icon_path = os.path.join(sys._MEIPASS, "icon.ico")
+        
+        if os.path.exists(icon_path):
+            self.setWindowIcon(QIcon(icon_path))
 
     def init_ui(self):
         # VS Code Inspired Palette

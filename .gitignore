@@ -40,3 +40,5 @@ DEBUG_PLUGINS/
 .DS_Store
 Thumbs.db
 GEMINI.md
+*.c
+setup.py
