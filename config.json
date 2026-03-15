@@ -1,9 +1,12 @@
 {
-    "plugin_name": "NavisIFCExporter",
-    "source_folder_name": "NavisIFCExporter",
+    "plugin_name": "NavisIFCExport",
+    "source_folder_name": "NavisIFCExport",
     "version_folder_prefix": "Navis",
     "navis_versions": [
-        "2022", "2023", "2024", "2025"
+        "2022",
+        "2023",
+        "2024",
+        "2025"
     ],
     "target_base_path": "C:/ProgramData/Autodesk/Navisworks Manage {version}/Plugins"
 }
