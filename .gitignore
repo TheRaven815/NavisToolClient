@@ -42,3 +42,4 @@ Thumbs.db
 GEMINI.md
 *.c
 setup.py
+/NavisIFCExporter
