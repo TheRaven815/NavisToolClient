@@ -390,7 +390,8 @@ class MainWindow(QMainWindow):
         footer = QHBoxLayout()
         footer.setContentsMargins(0, 8, 0, 0)
 
-        attr = QLabel("Coded by Enes Eliağır")
+        plugin_owner = self.config.get("plugin_owner", "Unknown")
+        attr = QLabel(f"Plugin Owner: {plugin_owner}")
         attr.setStyleSheet(f"color: {self.colors['text_dim']}; font-size: 11px;")
         footer.addWidget(attr)
 

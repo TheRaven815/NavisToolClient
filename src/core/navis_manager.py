@@ -1,6 +1,7 @@
 import os
 import shutil
 
+
 class NavisManager:
     def __init__(self, config_manager):
         self.config = config_manager
@@ -42,11 +43,33 @@ class NavisManager:
         except Exception:
             return False
 
+    def _get_allowed_extensions(self):
+        """Return normalized extension filters for plugin copy operation."""
+        copy_extensions = self.config.get("copy_extensions", {})
+        if not isinstance(copy_extensions, dict):
+            return set()
+
+        plugin_extensions = copy_extensions.get("plugin", [])
+        if not isinstance(plugin_extensions, list):
+            return set()
+
+        normalized = set()
+        for ext in plugin_extensions:
+            if not isinstance(ext, str):
+                continue
+            ext = ext.strip().lower()
+            if not ext:
+                continue
+            if not ext.startswith("."):
+                ext = f".{ext}"
+            normalized.add(ext)
+        return normalized
+
     def deploy_plugin(self, version):
         plugin_name = self.config.get("plugin_name", "NewPlugin")
         source_folder_name = self.config.get("source_folder_name", plugin_name)
         version_prefix = self.config.get("version_folder_prefix", "Navis")
-        
+
         # Use local folder for DEBUG version
         if version == "DEBUG":
             available_versions = self.config.get("navis_versions", ["2022"])
@@ -68,17 +91,33 @@ class NavisManager:
         try:
             if os.path.exists(plugin_target_dir):
                 shutil.rmtree(plugin_target_dir)
-            
+
             os.makedirs(plugin_target_dir, exist_ok=True)
-            
-            files_to_copy = [f for f in os.listdir(source_dir) if os.path.isfile(os.path.join(source_dir, f))]
-            
-            if not files_to_copy:
+
+            source_files = [f for f in os.listdir(source_dir) if os.path.isfile(os.path.join(source_dir, f))]
+
+            if not source_files:
                 return False, f"No files found in source: {source_dir}"
+
+            allowed_extensions = self._get_allowed_extensions()
+            if allowed_extensions:
+                files_to_copy = [
+                    file_name
+                    for file_name in source_files
+                    if os.path.splitext(file_name)[1].lower() in allowed_extensions
+                ]
+            else:
+                files_to_copy = source_files
+
+            if not files_to_copy:
+                return False, (
+                    f"No files matched configured plugin extensions in source: {source_dir}. "
+                    f"Allowed: {', '.join(sorted(allowed_extensions))}"
+                )
 
             for file_name in files_to_copy:
                 shutil.copy2(os.path.join(source_dir, file_name), plugin_target_dir)
-                
+
             return True, f"Successfully deployed {len(files_to_copy)} files to {display_version}."
         except Exception as e:
             return False, f"Error during deployment to {display_version}: {str(e)}"

@@ -1,5 +1,6 @@
 {
     "plugin_name": "NavisIFCExport",
+    "plugin_owner": "Enes Eliağır",
     "source_folder_name": "NavisIFCExport",
     "version_folder_prefix": "Navis",
     "navis_versions": [
@@ -8,5 +9,10 @@
         "2024",
         "2025"
     ],
-    "target_base_path": "C:/ProgramData/Autodesk/Navisworks Manage {version}/Plugins"
+    "target_base_path": "C:/ProgramData/Autodesk/Navisworks Manage {version}/Plugins",
+    "copy_extensions": {
+        "plugin": [
+            ".dll"
+        ]
+    }
 }
