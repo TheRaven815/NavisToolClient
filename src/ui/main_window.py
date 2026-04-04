@@ -31,29 +31,11 @@ class VersionRowWidget(QWidget):
         self._build_ui(display_name, is_installed, is_debug)
 
     def _build_ui(self, display_name: str, is_installed: bool, is_debug: bool):
-        self.setMinimumHeight(50)
+        self.setMinimumHeight(62)
 
         layout = QHBoxLayout(self)
-        layout.setContentsMargins(12, 7, 12, 7)
-        layout.setSpacing(10)
-
-        # ---- Status dot ----
-        dot = QLabel("●")
-        dot.setFixedWidth(10)
-        dot.setAlignment(Qt.AlignCenter)
-        if is_installed:
-            dot.setStyleSheet("color: #4ec994; font-size: 10px;")
-        elif is_debug:
-            dot.setStyleSheet(f"color: {self.colors['warning']}; font-size: 10px;")
-        else:
-            dot.setStyleSheet("color: #555; font-size: 10px;")
-        layout.addWidget(dot)
-
-        # ---- Icon ----
-        icon_lbl = QLabel("🛠️" if is_debug else "🏗️")
-        icon_lbl.setStyleSheet("font-size: 14px;")
-        icon_lbl.setFixedWidth(22)
-        layout.addWidget(icon_lbl)
+        layout.setContentsMargins(16, 10, 16, 10)
+        layout.setSpacing(12)
 
         # ---- Name + status ----
         name_col = QVBoxLayout()
@@ -68,12 +50,12 @@ class VersionRowWidget(QWidget):
         name_col.addWidget(name_lbl)
 
         if is_installed:
-            status_lbl = QLabel("● Installed")
+            status_lbl = QLabel("Installed")
             status_lbl.setStyleSheet(
                 "font-size: 10px; font-weight: 600; color: #4ec994; background: transparent;"
             )
         else:
-            status_lbl = QLabel("○ Not Installed")
+            status_lbl = QLabel("Not Installed")
             status_lbl.setStyleSheet(
                 f"font-size: 10px; color: {self.colors['text_dim']}; background: transparent;"
             )
@@ -107,17 +89,34 @@ class VersionRowWidget(QWidget):
         layout.addLayout(btn_layout)
 
         # Row background styling
-        bg = "#1e3a28" if is_installed else (
-            "#2d2a1e" if is_debug else self.colors['card']
+        bg = "#173429" if is_installed else (
+            "#3a3121" if is_debug else "#26282c"
         )
-        border = "#2d6b45" if is_installed else (
-            "#5a4d1e" if is_debug else self.colors['border']
+        hover_bg = "#204435" if is_installed else (
+            "#4a3d27" if is_debug else "#30333a"
         )
+        border = "#2f8f67" if is_installed else (
+            "#8a7128" if is_debug else "#4a4f59"
+        )
+        accent_line = "#4ec994" if is_installed else (
+            self.colors['warning'] if is_debug else "#6b7280"
+        )
+
+        self.setObjectName("VersionRow")
         self.setStyleSheet(f"""
-            VersionRowWidget {{
+            QWidget#VersionRow {{
                 background-color: {bg};
-                border-radius: 8px;
+                border-radius: 10px;
                 border: 1px solid {border};
+                border-left: 4px solid {accent_line};
+            }}
+            QWidget#VersionRow:hover {{
+                border-color: {self.colors['accent_hover']};
+                background-color: {hover_bg};
+            }}
+            QWidget#VersionRow QLabel {{
+                border: none;
+                background: transparent;
             }}
         """)
 
@@ -136,7 +135,7 @@ class MainWindow(QMainWindow):
         self.download_thread = None
 
         self.setWindowTitle("Navisworks Tool Client")
-        self.setMinimumSize(500, 400)
+        self.setMinimumSize(560, 460)
 
         self.set_app_icon()
         self.init_ui()
@@ -154,20 +153,20 @@ class MainWindow(QMainWindow):
     # ------------------------------------------------------------------
     def init_ui(self):
         self.colors = {
-            "bg":           "#1e1e2e",
-            "sidebar":      "#252535",
-            "card":         "#2a2a3e",
-            "accent":       "#0078d4",
-            "accent_hover": "#1a8fe0",
-            "success":      "#4ec994",
-            "danger":       "#e05252",
-            "danger_hover": "#c94141",
-            "text":         "#cdd6f4",
-            "text_bright":  "#f2f2f2",
-            "text_dim":     "#6c7086",
-            "border":       "#383850",
-            "warning":      "#cca700",
-            "status_bg":    "#0e639c",
+            "bg":           "#1e1e1e",
+            "sidebar":      "#252526",
+            "card":         "#2d2d30",
+            "accent":       "#0e639c",
+            "accent_hover": "#1177bb",
+            "success":      "#4ec9b0",
+            "danger":       "#f14c4c",
+            "danger_hover": "#d74141",
+            "text":         "#cccccc",
+            "text_bright":  "#ffffff",
+            "text_dim":     "#9da0a6",
+            "border":       "#3c3c3c",
+            "warning":      "#d7ba7d",
+            "status_bg":    "#007acc",
         }
 
         self.setStyleSheet(f"""
@@ -186,10 +185,10 @@ class MainWindow(QMainWindow):
             QFrame#Card {{
                 background-color: {self.colors['sidebar']};
                 border: 1px solid {self.colors['border']};
-                border-radius: 10px;
+                border-radius: 12px;
             }}
             QLabel#AppTitle {{
-                font-size: 20px;
+                font-size: 22px;
                 font-weight: 700;
                 color: {self.colors['text_bright']};
             }}
@@ -207,7 +206,7 @@ class MainWindow(QMainWindow):
                 background-color: {self.colors['accent']};
                 color: white;
                 border: none;
-                border-radius: 6px;
+                border-radius: 8px;
                 padding: 10px 20px;
                 font-size: 14px;
                 font-weight: 600;
@@ -215,46 +214,51 @@ class MainWindow(QMainWindow):
             QPushButton#PrimaryBtn:hover {{
                 background-color: {self.colors['accent_hover']};
             }}
+            QPushButton#PrimaryBtn:pressed {{
+                background-color: #0d588a;
+            }}
             QPushButton#PrimaryBtn:disabled {{
-                background-color: #2e4a63;
-                color: #5a7a99;
+                background-color: #3a3a3a;
+                color: #7c7c7c;
             }}
             QPushButton#SmallPrimaryBtn {{
-                background-color: {self.colors['accent']};
-                color: white;
-                border: none;
-                border-radius: 5px;
+                background-color: transparent;
+                color: #9cdcfe;
+                border: 1px solid {self.colors['accent']};
+                border-radius: 6px;
                 padding: 5px 14px;
                 font-size: 12px;
                 font-weight: 600;
             }}
             QPushButton#SmallPrimaryBtn:hover {{
-                background-color: {self.colors['accent_hover']};
+                background-color: rgba(14, 99, 156, 0.18);
+                border-color: {self.colors['accent_hover']};
+                color: #c7e9ff;
             }}
             QPushButton#DangerBtn {{
                 background-color: transparent;
                 color: {self.colors['danger']};
                 border: 1px solid {self.colors['danger']};
-                border-radius: 5px;
+                border-radius: 6px;
                 padding: 5px 14px;
                 font-size: 12px;
                 font-weight: 600;
             }}
             QPushButton#DangerBtn:hover {{
-                background-color: {self.colors['danger']};
-                color: white;
+                background-color: rgba(241, 76, 76, 0.15);
+                color: #ff8080;
             }}
             QPushButton#GhostBtn {{
-                background-color: transparent;
+                background-color: #2a2d2e;
                 color: {self.colors['text']};
                 border: 1px solid {self.colors['border']};
-                border-radius: 5px;
+                border-radius: 6px;
                 padding: 5px 13px;
                 font-size: 12px;
             }}
             QPushButton#GhostBtn:hover {{
-                background-color: #2a2a2a;
-                border-color: #555;
+                background-color: #313437;
+                border-color: #4b4b4b;
                 color: {self.colors['text_bright']};
             }}
             QScrollArea {{
@@ -263,21 +267,26 @@ class MainWindow(QMainWindow):
             }}
             QScrollBar:vertical {{
                 background: transparent;
-                width: 6px;
+                width: 10px;
+                margin: 4px 0;
             }}
             QScrollBar::handle:vertical {{
-                background: #444;
-                border-radius: 3px;
-                min-height: 24px;
+                background: #4a4a4a;
+                border-radius: 5px;
+                min-height: 28px;
+            }}
+            QScrollBar::handle:vertical:hover {{
+                background: #5a5a5a;
             }}
             QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {{
                 height: 0;
             }}
             QStatusBar {{
                 background-color: {self.colors['status_bg']};
-                color: #e0e0e0;
+                color: #ffffff;
                 font-size: 12px;
-                padding: 0 8px;
+                padding: 0 10px;
+                min-height: 24px;
             }}
             QStatusBar::item {{
                 border: none;
@@ -287,24 +296,24 @@ class MainWindow(QMainWindow):
         central = QWidget()
         self.setCentralWidget(central)
         root = QVBoxLayout(central)
-        root.setContentsMargins(14, 14, 14, 8)
+        root.setContentsMargins(18, 16, 18, 10)
         root.setSpacing(0)
 
         # ================================================================
         # HEADER
         # ================================================================
         header = QHBoxLayout()
-        header.setSpacing(0)
+        header.setSpacing(6)
 
         title_col = QVBoxLayout()
-        title_col.setSpacing(2)
+        title_col.setSpacing(4)
 
         plugin_name = self.config.get("plugin_name", "Plugin")
         title_lbl = QLabel(f"{plugin_name} Deployer")
         title_lbl.setObjectName("AppTitle")
         title_col.addWidget(title_lbl)
 
-        sub_lbl = QLabel("Navisworks Plugin Management Console")
+        sub_lbl = QLabel("Modern Plugin Deployment Console")
         sub_lbl.setObjectName("AppSubtitle")
         title_col.addWidget(sub_lbl)
 
@@ -314,15 +323,15 @@ class MainWindow(QMainWindow):
         # Version pill
         ver_pill = QLabel(f"v{self.current_version}")
         ver_pill.setStyleSheet(
-            f"background-color: #0e3a5e; color: #4da6e8; "
+            f"background-color: #094771; color: #9cdcfe; "
             f"font-size: 11px; font-weight: 700; "
-            f"border-radius: 10px; padding: 3px 10px;"
+            f"border-radius: 11px; padding: 4px 11px;"
         )
         ver_pill.setAlignment(Qt.AlignCenter)
         header.addWidget(ver_pill)
 
         root.addLayout(header)
-        root.addSpacing(12)
+        root.addSpacing(14)
 
         # ================================================================
         # VERSION LIST CARD
@@ -330,20 +339,20 @@ class MainWindow(QMainWindow):
         version_card = QFrame()
         version_card.setObjectName("Card")
         card_layout = QVBoxLayout(version_card)
-        card_layout.setContentsMargins(12, 10, 12, 10)
-        card_layout.setSpacing(8)
+        card_layout.setContentsMargins(14, 12, 14, 12)
+        card_layout.setSpacing(12)
 
         # Card header row
         card_header = QHBoxLayout()
-        sec_title = QLabel("DETECTED INSTALLATIONS")
+        sec_title = QLabel("DETECTED TARGETS")
         sec_title.setObjectName("SectionTitle")
         card_header.addWidget(sec_title)
         card_header.addStretch()
 
-        self.btn_refresh = QPushButton("↻  Refresh")
+        self.btn_refresh = QPushButton("⟳  Refresh")
         self.btn_refresh.setObjectName("GhostBtn")
         self.btn_refresh.setCursor(Qt.PointingHandCursor)
-        self.btn_refresh.setFixedHeight(26)
+        self.btn_refresh.setFixedHeight(28)
         self.btn_refresh.clicked.connect(self._refresh_with_animation)
         card_header.addWidget(self.btn_refresh)
         card_layout.addLayout(card_header)
@@ -351,34 +360,34 @@ class MainWindow(QMainWindow):
         # Divider line
         divider = QFrame()
         divider.setFrameShape(QFrame.HLine)
-        divider.setStyleSheet(f"color: {self.colors['border']}; background-color: {self.colors['border']}; border: none; max-height: 1px;")
+        divider.setStyleSheet("color: #3c3c3c; background-color: #3c3c3c; border: none; max-height: 1px;")
         card_layout.addWidget(divider)
 
         # Scroll area for version rows
         scroll = QScrollArea()
         scroll.setWidgetResizable(True)
-        scroll.setMinimumHeight(170)
+        scroll.setMinimumHeight(220)
 
         self.rows_container = QWidget()
         self.rows_container.setStyleSheet("background: transparent;")
         self.rows_layout = QVBoxLayout(self.rows_container)
-        self.rows_layout.setContentsMargins(0, 2, 0, 2)
-        self.rows_layout.setSpacing(5)
+        self.rows_layout.setContentsMargins(0, 4, 0, 4)
+        self.rows_layout.setSpacing(12)
         self.rows_layout.addStretch()
 
         scroll.setWidget(self.rows_container)
         card_layout.addWidget(scroll)
 
         root.addWidget(version_card)
-        root.addSpacing(10)
+        root.addSpacing(14)
 
         # ================================================================
         # DEPLOY ALL BUTTON
         # ================================================================
-        self.btn_deploy_all = QPushButton("⬆   Deploy Plugin to All Detected Versions")
+        self.btn_deploy_all = QPushButton("Deploy Plugin to All Detected Versions")
         self.btn_deploy_all.setObjectName("PrimaryBtn")
         self.btn_deploy_all.setCursor(Qt.PointingHandCursor)
-        self.btn_deploy_all.setMinimumHeight(38)
+        self.btn_deploy_all.setMinimumHeight(42)
         self.btn_deploy_all.clicked.connect(self.deploy_all)
         root.addWidget(self.btn_deploy_all)
 
@@ -388,16 +397,16 @@ class MainWindow(QMainWindow):
         # FOOTER
         # ================================================================
         footer = QHBoxLayout()
-        footer.setContentsMargins(0, 8, 0, 0)
+        footer.setContentsMargins(0, 10, 0, 2)
 
         plugin_owner = self.config.get("plugin_owner", "Unknown")
         attr = QLabel(f"Plugin Owner: {plugin_owner}")
-        attr.setStyleSheet(f"color: {self.colors['text_dim']}; font-size: 11px;")
+        attr.setStyleSheet(f"color: {self.colors['text_dim']}; font-size: 11px; font-weight: 500;")
         footer.addWidget(attr)
 
         footer.addStretch()
 
-        self.btn_update = QPushButton("Check for Updates")
+        self.btn_update = QPushButton("Check Updates")
         self.btn_update.setObjectName("GhostBtn")
         self.btn_update.setCursor(Qt.PointingHandCursor)
         self.btn_update.clicked.connect(self.check_updates)
@@ -421,7 +430,7 @@ class MainWindow(QMainWindow):
             self._anim_frame += 1
             if self._anim_frame >= 8:   # ~400 ms total (8 × 50 ms)
                 self._refresh_timer.stop()
-                self.btn_refresh.setText("↻  Refresh")
+                self.btn_refresh.setText("⟳  Refresh")
                 self.btn_refresh.setEnabled(True)
                 self.load_installed_versions()
 
@@ -465,7 +474,13 @@ class MainWindow(QMainWindow):
                     on_uninstall=self._uninstall_single,
                     colors=self.colors,
                 )
-                self.rows_layout.insertWidget(idx, row)
+                self.rows_layout.insertWidget(self.rows_layout.count() - 1, row)
+
+                if idx < len(versions) - 1:
+                    sep = QFrame()
+                    sep.setFrameShape(QFrame.HLine)
+                    sep.setStyleSheet("border: none; background-color: #3f444d; max-height: 1px; min-height: 1px;")
+                    self.rows_layout.insertWidget(self.rows_layout.count() - 1, sep)
 
         self.statusBar().showMessage("Ready")
 
