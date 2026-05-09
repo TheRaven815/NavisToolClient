@@ -1,8 +1,8 @@
 {
-    "plugin_name": "NavisIFCExport",
+    "plugin_name": "Navis IFC Export",
     "plugin_owner": "Enes Eliağır",
     "source_folder_name": "NavisIFCExport",
-    "version_folder_prefix": "Navis",
+    "version_folder_prefix": "Output_Secure_",
     "navis_versions": [
         "2022",
         "2023",

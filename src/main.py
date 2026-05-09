@@ -9,7 +9,7 @@ if root_dir not in sys.path:
 from PySide6.QtWidgets import QApplication
 from src.ui.main_window import MainWindow
 
-VERSION = "1.0.1"
+VERSION = "1.0.2"
 
 def main():
     app = QApplication(sys.argv)

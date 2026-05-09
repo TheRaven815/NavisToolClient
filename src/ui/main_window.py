@@ -31,16 +31,17 @@ class VersionRowWidget(QWidget):
         self._build_ui(display_name, is_installed, is_debug)
 
     def _build_ui(self, display_name: str, is_installed: bool, is_debug: bool):
-        self.setMinimumHeight(62)
+        self.setMinimumHeight(44)
 
         layout = QHBoxLayout(self)
-        layout.setContentsMargins(16, 10, 16, 10)
-        layout.setSpacing(12)
+        layout.setContentsMargins(14, 4, 14, 4)
+        layout.setSpacing(10)
 
         # ---- Name + status ----
         name_col = QVBoxLayout()
-        name_col.setSpacing(4)
+        name_col.setSpacing(2)
         name_col.setContentsMargins(0, 0, 0, 0)
+        name_col.setAlignment(Qt.AlignVCenter)
 
         name_color = "#f0ab00" if is_debug else self.colors['text_bright']
         name_lbl = QLabel(display_name)
@@ -62,18 +63,20 @@ class VersionRowWidget(QWidget):
         name_col.addWidget(status_lbl)
 
         layout.addLayout(name_col)
+        layout.setAlignment(name_col, Qt.AlignVCenter)
         layout.addStretch()
 
         # ---- Action buttons ----
         btn_layout = QHBoxLayout()
-        btn_layout.setSpacing(8)
+        btn_layout.setSpacing(6)
         btn_layout.setContentsMargins(0, 0, 0, 0)
+        btn_layout.setAlignment(Qt.AlignVCenter)
 
         if is_installed:
             btn_uninstall = QPushButton("Uninstall")
             btn_uninstall.setObjectName("DangerBtn")
             btn_uninstall.setCursor(Qt.PointingHandCursor)
-            btn_uninstall.setFixedHeight(26)
+            btn_uninstall.setFixedHeight(24)
             btn_uninstall.setMinimumWidth(70)
             btn_uninstall.clicked.connect(lambda: self.on_uninstall(self.version_id))
             btn_layout.addWidget(btn_uninstall)
@@ -81,12 +84,13 @@ class VersionRowWidget(QWidget):
         btn_deploy = QPushButton("Deploy")
         btn_deploy.setObjectName("SmallPrimaryBtn")
         btn_deploy.setCursor(Qt.PointingHandCursor)
-        btn_deploy.setFixedHeight(26)
+        btn_deploy.setFixedHeight(24)
         btn_deploy.setMinimumWidth(62)
         btn_deploy.clicked.connect(lambda: self.on_deploy(self.version_id))
         btn_layout.addWidget(btn_deploy)
 
         layout.addLayout(btn_layout)
+        layout.setAlignment(btn_layout, Qt.AlignVCenter)
 
         # Row background styling
         bg = "#173429" if is_installed else (
@@ -371,8 +375,8 @@ class MainWindow(QMainWindow):
         self.rows_container = QWidget()
         self.rows_container.setStyleSheet("background: transparent;")
         self.rows_layout = QVBoxLayout(self.rows_container)
-        self.rows_layout.setContentsMargins(0, 4, 0, 4)
-        self.rows_layout.setSpacing(12)
+        self.rows_layout.setContentsMargins(0, 2, 0, 2)
+        self.rows_layout.setSpacing(6)
         self.rows_layout.addStretch()
 
         scroll.setWidget(self.rows_container)
