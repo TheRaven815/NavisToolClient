@@ -17,24 +17,23 @@ Temel özellikler:
 
 ## Mimari ve Çalışma Akışı
 
-1. `run.py`, uygulamanın ana giriş noktasıdır ve `src.main.main()` fonksiyonunu çağırır.
-2. `src/main.py`, proje kökünü `sys.path` içine ekler, `QApplication` oluşturur ve `MainWindow` örneğini başlatır.
-3. `src/ui/main_window.py`, kullanıcı arayüzünü kurar, hedef listesini gösterir, deploy/uninstall butonlarını bağlar ve update/download akışını yönetir.
-4. `src/core/navis_manager.py`, Navisworks sürüm tespiti, eklenti kurulu mu kontrolü, deploy ve uninstall işlemlerinden sorumludur.
-5. `src/utils/config_manager.py`, `config.json` dosyasını okur/yazar ve ayarlara erişim sağlar.
-6. `src/core/updater/checker.py`, GitHub Releases API ile yeni sürüm kontrolünü arka plan worker sınıflarıyla yapar.
-7. `src/core/updater/downloader.py`, güncelleme `.exe` dosyasını stream ederek indirir ve ilerleme sinyalleri üretir.
-8. `src/utils/constants.py`, update sistemi için repository, asset uzantısı ve geçici indirme dosyası sabitlerini tutar.
+1. `main.py`, uygulamanın ana giriş noktasıdır; `QApplication` oluşturur ve `MainWindow` örneğini başlatır.
+2. `src/ui/main_window.py`, kullanıcı arayüzünü kurar, hedef listesini gösterir, deploy/uninstall butonlarını bağlar ve update/download akışını yönetir.
+3. `src/core/navis_manager.py`, Navisworks sürüm tespiti, eklenti kurulu mu kontrolü, deploy ve uninstall işlemlerinden sorumludur.
+4. `src/utils/config_manager.py`, `config.json` dosyasını okur/yazar ve ayarlara erişim sağlar.
+5. `src/core/updater/checker.py`, GitHub Releases API ile yeni sürüm kontrolünü arka plan worker sınıflarıyla yapar.
+6. `src/core/updater/downloader.py`, güncelleme `.exe` dosyasını stream ederek indirir ve ilerleme sinyalleri üretir.
+7. `src/utils/constants.py`, update sistemi için repository, asset uzantısı ve geçici indirme dosyası sabitlerini tutar.
 
 ## Önemli Dosyalar
 
 - `README.md`: Kullanıcıya dönük açıklama, kurulum, konfigürasyon ve kullanım dokümantasyonu.
 - `requirements.txt`: Çalışma ve paketleme bağımlılıkları. Mevcut pinleri gereksiz değiştirmeyin.
 - `config.json`: Eklenti adı, kaynak klasör, sürüm listesi, hedef path şablonu ve kopyalanacak uzantı filtreleri.
-- `version.json`: Yayın sürümü metadatası. Uygulama içi görünen sürüm ayrıca `src/main.py` içindeki `VERSION` sabitinden gelir.
+- `version.json`: Yayın sürümü metadatası. Uygulama içi görünen sürüm ayrıca `main.py` içindeki `VERSION` sabitinden gelir.
 - `icon.ico`: Pencere ve paketlenmiş `.exe` ikonu.
 - `setup.py`: PyInstaller ile tek dosya Windows executable üretmek için yardımcı build betiği.
-- `run.py`: Paketleme ve geliştirme sırasında tercih edilen giriş noktası.
+- `main.py`: Paketleme ve geliştirme sırasında tercih edilen giriş noktası.
 
 ## Konfigürasyon Notları
 
@@ -59,7 +58,7 @@ Debug mode varsayılan olarak `src/core/navis_manager.py` içinde `DEBUG_MODE = 
 - Deploy işlemi hedef plugin klasörünü silip yeniden oluşturur. Bu davranışı değiştirirken kullanıcı verisi kaybı riskini değerlendirin.
 - `copy_extensions` filtresini dikkate alın; kaynak klasörlerden sadece izin verilen uzantıların kopyalanması beklenir.
 - Update sistemi `.exe` release asset arar. `src/utils/constants.py` içindeki `ASSET_EXTENSION = ".exe"` varsayımını bozmadan değişiklik yapın.
-- Sürüm güncellerken `src/main.py` içindeki `VERSION`, `version.json` ve yayın notları tutarlı olmalıdır.
+- Sürüm güncellerken `main.py` içindeki `VERSION`, `version.json` ve yayın notları tutarlı olmalıdır.
 
 ## Kurulum ve Çalıştırma
 
@@ -69,7 +68,7 @@ Geliştirme ortamı için önerilen akış:
 python -m venv venv
 .\venv\Scripts\activate
 pip install -r requirements.txt
-python run.py
+python main.py
 ```
 
 Uygulama Windows 10/11 ve Python 3.10+ hedefler. Navisworks yüklü olmayan makinelerde debug hedefi sayesinde deploy mantığı `DEBUG_PLUGINS` klasörüne karşı test edilebilir.
@@ -79,13 +78,13 @@ Uygulama Windows 10/11 ve Python 3.10+ hedefler. Navisworks yüklü olmayan maki
 Projede ayrı bir test paketi bulunmuyor. Değişiklik sonrası en azından aşağıdaki kontrolleri yapın:
 
 ```bash
-python -m py_compile run.py src/main.py src/core/navis_manager.py src/core/updater/checker.py src/core/updater/downloader.py src/ui/main_window.py src/utils/config_manager.py src/utils/constants.py setup.py
+python -m py_compile main.py src/core/navis_manager.py src/core/updater/checker.py src/core/updater/downloader.py src/ui/main_window.py src/utils/config_manager.py src/utils/constants.py setup.py
 python setup.py --help
 ```
 
 UI veya deploy davranışını değiştirdiyseniz manuel kontrol önerilir:
 
-1. `python run.py` ile uygulamayı başlatın.
+1. `python main.py` ile uygulamayı başlatın.
 2. `LOCAL DEBUG` satırının göründüğünü doğrulayın.
 3. Örnek plugin dosyaları varsa deploy/uninstall akışını `DEBUG_PLUGINS` üzerinde deneyin.
 4. Network erişimi varsa `Check Updates` butonunun hata vermeden sonuçlandığını kontrol edin.
@@ -106,7 +105,7 @@ dist/NavisToolClient.exe
 
 Betiğin hedefleri:
 
-- `run.py` giriş noktasını paketlemek.
+- `main.py` giriş noktasını paketlemek.
 - `--onefile` ve `--windowed` modunda GUI executable üretmek.
 - `icon.ico` dosyasını executable ikonu olarak kullanmak.
 - `icon.ico`, `config.json` ve `version.json` dosyalarını PyInstaller data dosyası olarak dahil etmek.
@@ -117,9 +116,9 @@ Paketlenmiş uygulamada `config.json` dosyasının çalışma dizini beklentisin
 
 ## Gelecekteki Ajanlar İçin Net Talimatlar
 
-- Önce `README.md`, `config.json`, `run.py`, `src/main.py`, `src/core/navis_manager.py`, `src/ui/main_window.py` ve updater modüllerini okuyun.
+- Önce `README.md`, `config.json`, `main.py`, `src/core/navis_manager.py`, `src/ui/main_window.py` ve updater modüllerini okuyun.
 - İstenen görev paketleme ile ilgiliyse önce `setup.py` içindeki PyInstaller argümanlarını kontrol edin.
 - Uygulama kodunda değişiklik yapmadan önce mevcut deploy/update akışını anlayın; UI ile core arasındaki bağlantılar `MainWindow` üzerinden yürür.
-- Dosya yolu davranışını değiştirirken hem kaynak çalıştırma (`python run.py`) hem de PyInstaller onefile çalıştırma senaryosunu düşünün.
+- Dosya yolu davranışını değiştirirken hem kaynak çalıştırma (`python main.py`) hem de PyInstaller onefile çalıştırma senaryosunu düşünün.
 - Bağımlılık eklerken `requirements.txt` dosyasına pinli ve minimum gerekli eklemeyi yapın; mevcut bağımlılık sürümlerini gereksiz yükseltmeyin/düşürmeyin.
 - Her değişiklikten sonra en azından syntax kontrolü ve ilgili build yardım komutunu çalıştırın.

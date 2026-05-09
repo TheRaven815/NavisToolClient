@@ -28,7 +28,7 @@
 ```
 NavisToolClient/
 │
-├── run.py                        # Entry point
+├── main.py                       # Entry point, version constant
 ├── config.json                   # Plugin configuration (edit this!)
 ├── version.json                  # Current app version metadata
 ├── requirements.txt              # Python dependencies
@@ -45,7 +45,6 @@ NavisToolClient/
 ├── DEBUG_PLUGINS/                # Local deploy target (auto-created on first debug deploy)
 │
 └── src/
-    ├── main.py                   # App entry, version constant
     ├── ui/
     │   └── main_window.py        # Main GUI window
     ├── core/
@@ -148,7 +147,7 @@ C:/ProgramData/Autodesk/Navisworks Manage 2024/Plugins/NavisIFCExport/
 
 6. **Run the application:**
    ```bash
-   python run.py
+   python main.py
    ```
 
 ---
