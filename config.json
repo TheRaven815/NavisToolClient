@@ -1,5 +1,5 @@
 {
-    "plugin_name": "Navis IFC Export",
+    "plugin_name": "NavisIFCExport",
     "plugin_owner": "Enes Eliağır",
     "source_folder_name": "NavisIFCExport",
     "version_folder_prefix": "Output_Secure_",
